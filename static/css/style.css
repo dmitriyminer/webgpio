@@ -1,0 +1,17 @@
+span.btn-grid {
+  padding: 0.2em 0.4em;
+}
+
+.header-actions {
+  margin-bottom: 20px;
+}
+
+.status-connected {
+  font-weight: bold;
+  color: #33a735;
+}
+
+.status-disconnected {
+  font-weight: bold;
+  color: #d8332e;
+}

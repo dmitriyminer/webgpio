@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h5>#{{device}}</h5>
+<div class="pull-right header-actions">
+  <a href="/device/{{ device }}/port/add" class="btn btn-success">
+    <i class="fa fa-plus" aria-hidden="true"></i>
+    Add new port
+  </a>
+</div>
+{% if ports %}
+<form action="/device/{{ device }}/update" method="post">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>GPIO</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for port in ports %}
+      <tr>
+        <td>{{ port.gpio }}</td>
+        <td>{{ port.name }}</td>
+        <td>
+
+          <input type='checkbox' name='gpio_{{ port.gpio }}_{{ device }}' 
+                 onchange="setHiddenStatus(this)"
+                 {% if port.status %}checked{% endif %}>
+          <input type='hidden' id="gpio_{{ port.gpio }}_{{ device }}" 
+                 name='status_{{ port.gpio }}_{{ device }}'
+                 value='{% if port.status %}on{% else %}off{% endif %}'>
+        </td>
+        <td>
+          <span class="btn-grid">
+            <a href="/device/{{ device }}/port/{{ port.id }}/edit">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </a>
+          </span>
+          <span class="btn-grid">
+            <a href="/device/{{ device }}/port/{{ port.id }}/delete">
+              <i class="fa fa-trash-o" aria-hidden="true"></i>
+            </a>
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <button type="submit" class="btn btn-primary pull-right">Update</button>
+</form>
+{% else %}
+<p>There are no ports</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function setHiddenStatus(ch) {
+      var target_id = ch.name;
+      if (ch.checked) {
+          document.getElementById(target_id).value = 'on'
+      } else {
+          document.getElementById(target_id).value = 'off'
+      }
+  }
+</script>
+{% endblock %}

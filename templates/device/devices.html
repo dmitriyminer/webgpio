@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pull-right header-actions">
+  <a href="{{ url('device_add') }}" class="btn btn-success ">
+    <i class="fa fa-plus" aria-hidden="true"></i>Add new device
+  </a>
+</div>
+{% if devices %}
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Key</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for device in devices %}
+      <tr>
+        <td>
+          <a href="/device/{{ device.key }}">{{ device.name }}</a>
+        </td>
+        <td>
+          {{ device.key }}
+        </td>
+        <td>
+          {% if status[device.key] %}
+          <span class="status-connected">Connected</span>
+          {% else %}
+          <span class="status-disconnected">Disconnected</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="btn-grid">
+            <a href="/device/{{ device.key }}/edit">
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+          </a>
+          </span>
+          <span class="btn-grid">
+            <a href="/device/{{ device.key }}/delete">
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
+          </a>
+          </span>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>There are no devices</p>
+{% endif %}
+{% endblock %}

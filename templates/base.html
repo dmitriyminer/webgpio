@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url('static', filename='css/font-awesome.min.css') }}"
+        rel="stylesheet" type="text/css">
+  <link href="{{ url('static', filename='css/bootstrap-4.0.0-alpha.5.css') }}"
+        rel="stylesheet" type="text/css">
+  <link href="{{ url('static', filename='css/style.css') }}"
+        rel="stylesheet" type="text/css">
+</head>
+<body>
+
+{% block navbar %}
+<nav class="navbar navbar-full navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url('home') }}">GPIO CONTROL</a>
+    <ul class="nav navbar-nav float-sm-right">
+      {% if request.user %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('devices') }}">Devices</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('logout') }}">Logout</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('login') }}">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('register') }}">Registration</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+
+<div class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% block errors %}
+        {% if errors %}
+        <ul>
+          {% for error in errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endblock %}
+        {% block content %}<p>{{ content }}</p>{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"
+        src="{{ url('static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url('static', filename='js/tether.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url('static', filename='js/bootstrap.js') }}"></script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

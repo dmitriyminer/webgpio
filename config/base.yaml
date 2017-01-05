@@ -1,0 +1,8 @@
+DEBUG: True
+
+host: 127.0.0.1
+database: gpio_control
+user: gpio
+password: gpio
+
+SECRET_KEY: CO8-hNHdHZ8fK-VjZgBf0OWQ-fFSCwP1T-u1cLSPeV8=

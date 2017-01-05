@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Device edit</h3>
+<div class="col-md-6 offset-md-3">
+  <form action="/device/{{ obj.key }}/edit" method="post">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" type="text" class="form-control" name="name"
+             value="{{ obj.name }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary pull-right">Update</button>
+  </form>
+</div>
+{% endblock %}
