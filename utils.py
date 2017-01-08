@@ -11,6 +11,8 @@ def load_config(f):
     t.String().check(data.get('database'))
     t.String().check(data.get('user'))
     t.String().check(data.get('password'))
+    t.String().check(data.get('redis_host'))
+    t.Int().check(data.get('redis_port'))
     t.String(regex=r'^[0-9a-zA-Z_=\-]{44}$').check(data.get('SECRET_KEY'))
     # generate SECRET_KEY base64.urlsafe_b64encode(os.urandom(32))
 

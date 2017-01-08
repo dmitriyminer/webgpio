@@ -1,8 +1,10 @@
 DEBUG: True
 
 host: 127.0.0.1
-database: gpio_control
+database: webgpio
 user: gpio
 password: gpio
 
+redis_host: 127.0.0.1
+redis_port: 6379
 SECRET_KEY: CO8-hNHdHZ8fK-VjZgBf0OWQ-fFSCwP1T-u1cLSPeV8=

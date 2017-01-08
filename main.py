@@ -18,6 +18,9 @@ from routes import setup_routes
 from utils import load_config
 
 
+ROOT_PATH = pathlib.Path(__file__).parent
+
+
 def setup_logger(name, filename):
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     fh = logging.FileHandler(filename)
@@ -35,7 +38,7 @@ def init_app():
     aiohttp_jinja2.setup(app,
                          context_processors=(
                              aiohttp_jinja2.request_processor,),
-                         loader=JinjaLoader('../aiogpio/templates'))
+                         loader=JinjaLoader(str(ROOT_PATH / 'templates')))
     config_path = str(pathlib.Path('.') / 'config' / 'base.yaml')
     app['config'] = load_config(config_path)
 
@@ -72,7 +75,9 @@ async def close_pg(app):
 
 
 async def init_redis(app):
-    pool = await aioredis.create_pool(('localhost', 6379))
+    conf = app['config']
+    pool = await aioredis.create_pool((conf['redis_host'],
+                                       conf['redis_port']))
     app['redis'] = pool
 
 
