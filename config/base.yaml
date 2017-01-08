@@ -1,6 +1,7 @@
-DEBUG: True
+DEBUG: False
 
 host: 127.0.0.1
+port: 5432
 database: webgpio
 user: gpio
 password: gpio

@@ -1,7 +1,6 @@
 import logging
 import pathlib
 
-import aiohttp_debugtoolbar
 import aiohttp_jinja2
 import aioredis
 from aiohttp import web
@@ -54,6 +53,7 @@ def init_app():
     app.on_cleanup.append(close_redis)
 
     if app['config']['DEBUG']:
+        import aiohttp_debugtoolbar
         aiohttp_debugtoolbar.setup(app, intercept_redirects=False)
 
     return app
@@ -65,6 +65,7 @@ async def init_pg(app):
                                  user=conf['user'],
                                  password=conf['password'],
                                  host=conf['host'],
+                                 port=conf['port'],
                                  loop=app.loop)
     app['db'] = engine
 

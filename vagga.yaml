@@ -6,20 +6,14 @@ containers:
     - !UbuntuPPA jonathonf/python-3.6
     - !Install [libpq-dev, python3.6, libc6-dev, libpython3.6-dev, libpython3.6]
     - !PipConfig {dependencies: true, python-exe: python3.6}
-    - !Py3Requirements "requirements/dev.txt"
+    - !Py3Requirements "requirements/base.txt"
     - !Py3Install [setuptools]
   
   redis:
     setup:
-    - !Ubuntu xenial
-    - !UbuntuUniverse
-    - !Sh apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C7917B12
-    - !UbuntuRepo
-      url: http://ppa.launchpad.net/chris-lea/redis-server/ubuntu
-      suite: xenial
-      components: [main]
-    - !Install [redis-server]
-
+    - !Alpine v3.5
+    - !Install [redis]
+  
   postgres:
     setup:
     - !Ubuntu xenial
