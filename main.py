@@ -38,7 +38,7 @@ def init_app():
                          context_processors=(
                              aiohttp_jinja2.request_processor,),
                          loader=JinjaLoader(str(ROOT_PATH / 'templates')))
-    config_path = str(pathlib.Path('.') / 'config' / 'base.yaml')
+    config_path = str(ROOT_PATH / 'config' / 'base.yaml')
     app['config'] = load_config(config_path)
 
     setup_routes(app)
