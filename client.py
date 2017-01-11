@@ -1,25 +1,33 @@
 import asyncio
 import json
+from collections import deque
 from urllib.parse import urlencode
 
+import RPi.GPIO as GPIO
 import aiohttp
 
-LOGIN_URL = 'http://127.0.0.1:8080/login'
+REMOTE_PORT = '8080'
+REMOTE_SERVER = f'http://remote.address.name:{REMOTE_PORT}'
+LOGIN_URL = f'{SERVER}/login'
 EMAIL = 'user@mail.com'
 PASSWD = 'password'
 DEVICE_KEY = '43E701BF'
-DEVICE_URL = f'http://127.0.0.1:8080/ws/{DEVICE_KEY}/status'
-UPDATE_TIME = 3
+DEVICE_URL = f'{SERVER}/ws/{DEVICE_KEY}/status'
+UPDATE_TIME = 1
+DEQUE_LENGTH = 28
 
 SESSION_KEY = 'AIOHTTP_SESSION'
 HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+GPIO.setmode(GPIO.BCM)
 
 
 class WebGPIOClient:
     def __init__(self, loop):
         self._loop = loop
         self._cookie = None
-        self._ports_status = []
+        self._ports_status = deque(maxlen=DEQUE_LENGTH)
+        self._current_status = dict()
 
     async def auth(self):
         data = urlencode({'email': EMAIL, 'passwd': PASSWD})
@@ -29,7 +37,6 @@ class WebGPIOClient:
                 history = next(iter(resp.history), None)
                 if history:
                     cookies = history.cookies.get(SESSION_KEY)
-                    print(cookies.key, cookies.value)
                     self._cookie = (cookies.key, cookies.value)
         return self._cookie
 
@@ -44,15 +51,27 @@ class WebGPIOClient:
                         await asyncio.sleep(UPDATE_TIME)
                         msg = await ws.receive()
                         try:
-                            self._ports_status = json.loads(msg.data)
+                            ports_status = json.loads(msg.data)
                         except Exception:
-                            self._ports_status = []
-                        print(self._ports_status)
+                            ports_status = []
+                        self._ports_status.extend(ports_status)
 
     async def controller(self):
         while True:
-            print('controller', self._ports_status)
-            await asyncio.sleep(UPDATE_TIME)
+            try:
+                item = self._ports_status.popleft()
+            except IndexError:
+                await asyncio.sleep(UPDATE_TIME)
+            else:
+                gpio = item.get('gpio')
+                status = item.get('status')
+
+                if gpio not in self._current_status:
+                    GPIO.setup(gpio, GPIO.OUT)
+
+                if self._current_status.get(gpio) != status:
+                    self._current_status[gpio] = status
+                    GPIO.output(gpio, status)
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
@@ -65,3 +84,4 @@ if __name__ == '__main__':
         pass
     finally:
         loop.close()
+        GPIO.cleanup()
