@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 
@@ -129,6 +130,23 @@ async def sa_port_list(db, user, device):
             async for row in conn.execute(stmt):
                 objs.append(row)
     return objs
+
+
+async def sa_port_status(db, device):
+    """
+    Return: ports status for specific device
+    '[{'gpio': 1, 'status': True}, {'gpio': 2, 'status': True}]'
+
+    """
+    ports_status = []
+    j = sa.join(devices, ports, devices.c.id == ports.c.device_id)
+    stmt = sa.select([ports]).select_from(j) \
+        .where(devices.c.key == device).order_by(ports.c.gpio)
+    async with db.acquire() as conn:
+        async for row in conn.execute(stmt):
+            ports_status.append({'gpio': row.gpio, 'status': row.status})
+
+    return json.dumps(ports_status)
 
 
 async def sa_device_list(db, user):
