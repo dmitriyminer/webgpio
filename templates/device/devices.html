@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="pull-right header-actions">
-  <a href="{{ url('device_add') }}" class="btn btn-success ">
+  <a href="{{ url('device-add') }}" class="btn btn-success ">
     <i class="fa fa-plus" aria-hidden="true"></i>Add new device
   </a>
 </div>
@@ -21,7 +21,9 @@
     {% for device in devices %}
       <tr>
         <td>
-          <a href="/device/{{ device.key }}">{{ device.name }}</a>
+          <a href="{{ url('ports', parts={'device': device.key}) }}">
+            {{ device.name }}
+          </a>
         </td>
         <td>
           {{ device.key }}
@@ -35,12 +37,12 @@
         </td>
         <td>
           <span class="btn-grid">
-            <a href="/device/{{ device.key }}/edit">
+            <a href="{{ url('device-edit', parts={'device': device.key}) }}">
             <i class="fa fa-pencil" aria-hidden="true"></i>
           </a>
           </span>
           <span class="btn-grid">
-            <a href="/device/{{ device.key }}/delete">
+            <a href="{{ url('device-delete', parts={'device': device.key}) }}">
             <i class="fa fa-trash-o" aria-hidden="true"></i>
           </a>
           </span>

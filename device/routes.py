@@ -7,16 +7,16 @@ def setup_routes(app):
     app.router.add_get('/', home, name='home')
     app.router.add_get('/devices', device_list, name='devices')
     app.router.add_get('/device/{device}/port/{port}/delete',
-                       port_delete, name='port_delete')
-    app.router.add_route('*', '/device/add', device_add, name='device_add')
+                       port_delete, name='port-delete')
+    app.router.add_route('*', '/device/add', device_add, name='device-add')
     app.router.add_route('*', '/device/{device}/port/add',
-                         port_add, name='port_add')
+                         port_add, name='port-add')
     app.router.add_route('*', '/device/{device}', port_list, name='ports')
     app.router.add_route('*', '/device/{device}/update',
-                         port_update, name='port_update')
+                         port_update, name='port-update')
     app.router.add_route('*', '/device/{device}/edit',
-                         device_edit, name='device_edit')
+                         device_edit, name='device-edit')
     app.router.add_route('*', '/device/{device}/delete',
-                         device_delete, name='device_delete')
+                         device_delete, name='device-delete')
     app.router.add_route('*', '/device/{device}/port/{port}/edit',
-                         port_edit, name='port_edit')
+                         port_edit, name='port-edit')

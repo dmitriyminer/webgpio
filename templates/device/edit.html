@@ -3,7 +3,7 @@
 {% block content %}
 <h3>Device edit</h3>
 <div class="col-md-6 offset-md-3">
-  <form action="/device/{{ obj.key }}/edit" method="post">
+  <form action="{{ url('device-edit', parts={'device': obj.key}) }}" method="post">
     <div class="form-group">
       <label for="name">Name</label>
       <input id="name" type="text" class="form-control" name="name"

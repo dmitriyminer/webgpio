@@ -40,14 +40,15 @@ async def port_edit(request):
     if data.get('name') and data.get('gpio'):
         await sa_port_edit(request.app['db'], request.user,
                            port=port, device=device, **data)
-        return web.HTTPFound(f'/device/{device}')
-    else:
-        port = await sa_port(request.app['db'], request.user, device, port)
-        gpios = await sa_free_gpio(request.app['db'], request.user, device)
-        gpios.append(port.gpio)
-        gpios.sort()
-        context = {'gpios': gpios, 'device': device, 'port': port}
-        return context
+        url = request.app.router['ports'].url(parts={'device': device})
+        return web.HTTPFound(url)
+
+    port = await sa_port(request.app['db'], request.user, device, port)
+    gpios = await sa_free_gpio(request.app['db'], request.user, device)
+    gpios.append(port.gpio)
+    gpios.sort()
+    context = {'gpios': gpios, 'device': device, 'port': port}
+    return context
 
 
 async def port_update(request):
@@ -61,7 +62,9 @@ async def port_update(request):
             gpio = item.split('_')[1]
             statuses.append({'gpio': gpio, 'status': data[item] == 'on'})
         await sa_port_update(request.app['db'], request.user, device, statuses)
-    return web.HTTPFound(f'/device/{device}')
+
+    url = request.app.router['ports'].url(parts={'device': device})
+    return web.HTTPFound(url)
 
 
 @aiohttp_jinja2.template('device/port_add.html')
@@ -81,7 +84,8 @@ async def port_add(request):
 
     if data and data.get('name') and gpio in valid_gpio:
         await sa_port_add(request.app['db'], request.user, device, **data)
-        return web.HTTPFound(f'/device/{device}')
+        url = request.app.router['ports'].url(parts={'device': device})
+        return web.HTTPFound(url)
     return context
 
 
@@ -96,7 +100,8 @@ async def device_edit(request):
                         devices.c.user_id == request.user)).\
                 values(name=data.get('name'))
             await conn.execute(stmt)
-        return web.HTTPFound('/devices')
+        url = request.app.router['devices'].url()
+        return web.HTTPFound(url)
     else:
         context = dict()
         query = sa.select([devices]).where(devices.c.key == device)
@@ -127,5 +132,5 @@ async def port_delete(request):
     device = request.match_info['device']
     port = request.match_info['port']
     await sa_port_delete(request.app['db'], request.user, device, port)
-
-    return web.HTTPFound(f'/device/{device}/update')
+    url = request.app.router['port-update'].url(parts={'device': device})
+    return web.HTTPFound(url)

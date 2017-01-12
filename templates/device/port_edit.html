@@ -4,7 +4,7 @@
 <h3>Port edit</h3>
 <div class="col-md-6 offset-md-3">
   {% if port %}
-  <form action="/device/{{ device }}/port/{{ port.id }}/edit" method="post">
+  <form action="{{ url('port-edit', parts={'device': device, 'port': port.id}) }}" method="post">
     <div class="form-group">
       <label for="name">Port name</label>
       <input id="name" type="text" class="form-control" name="name"

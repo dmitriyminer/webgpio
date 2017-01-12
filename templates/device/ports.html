@@ -3,13 +3,13 @@
 {% block content %}
 <h5>#{{device}}</h5>
 <div class="pull-right header-actions">
-  <a href="/device/{{ device }}/port/add" class="btn btn-success">
+  <a href="{{ url('port-add', parts={'device': device}) }}" class="btn btn-success">
     <i class="fa fa-plus" aria-hidden="true"></i>
     Add new port
   </a>
 </div>
 {% if ports %}
-<form action="/device/{{ device }}/update" method="post">
+<form action="{{ url('port-update', parts={'device': device}) }}" method="post">
   <div class="table-responsive">
     <table class="table">
       <thead>
@@ -26,7 +26,6 @@
         <td>{{ port.gpio }}</td>
         <td>{{ port.name }}</td>
         <td>
-
           <input type='checkbox' name='gpio_{{ port.gpio }}_{{ device }}' 
                  onchange="setHiddenStatus(this)"
                  {% if port.status %}checked{% endif %}>
@@ -36,12 +35,12 @@
         </td>
         <td>
           <span class="btn-grid">
-            <a href="/device/{{ device }}/port/{{ port.id }}/edit">
+            <a href="{{ url('port-edit', parts={'device': device, 'port': port.id}) }}">
               <i class="fa fa-pencil" aria-hidden="true"></i>
             </a>
           </span>
           <span class="btn-grid">
-            <a href="/device/{{ device }}/port/{{ port.id }}/delete">
+            <a href="{{ url('port-delete', parts={'device': device, 'port': port.id}) }}">
               <i class="fa fa-trash-o" aria-hidden="true"></i>
             </a>
           </span>
