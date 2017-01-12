@@ -7,12 +7,12 @@ import RPi.GPIO as GPIO
 import aiohttp
 
 REMOTE_PORT = '8080'
-REMOTE_SERVER = f'http://remote.address.name:{REMOTE_PORT}'
-LOGIN_URL = f'{SERVER}/login'
+REMOTE_SERVER = f'http://127.0.0.1:{REMOTE_PORT}'
+LOGIN_URL = f'{REMOTE_SERVER}/login'
 EMAIL = 'user@mail.com'
 PASSWD = 'password'
 DEVICE_KEY = '43E701BF'
-DEVICE_URL = f'{SERVER}/ws/{DEVICE_KEY}/status'
+DEVICE_URL = f'{REMOTE_SERVER}/ws/{DEVICE_KEY}/status'
 UPDATE_TIME = 1
 DEQUE_LENGTH = 28
 

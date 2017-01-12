@@ -40,7 +40,7 @@ def init_app():
                          loader=JinjaLoader(str(ROOT_PATH / 'templates')))
     config_path = str(ROOT_PATH / 'config' / 'base.yaml')
     app['config'] = load_config(config_path)
-
+    app['sockets'] = []
     setup_routes(app)
     setup_auth_routes(app)
     setup_device_routes(app)
@@ -51,6 +51,7 @@ def init_app():
     app.on_startup.append(init_session)
     app.on_cleanup.append(close_pg)
     app.on_cleanup.append(close_redis)
+    app.on_shutdown.append(close_sockets)
 
     if app['config']['DEBUG']:
         import aiohttp_debugtoolbar
@@ -94,5 +95,9 @@ def init_session(app):
     )
     app.middlewares.append(auth_middleware)
 
+
+async def close_sockets(app):
+    for ws in app['sockets']:
+        await ws.close()
 
 server = init_app()
