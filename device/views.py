@@ -6,7 +6,7 @@ from db import devices
 from device.sa import (sa_port_update, sa_device_delete, sa_port_delete,
                        sa_port_list, sa_device_list, sa_device_add,
                        sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
-                       sa_device_status)
+                       sa_device_status, user_tasks)
 
 
 @aiohttp_jinja2.template('base.html')
@@ -134,3 +134,12 @@ async def port_delete(request):
     await sa_port_delete(request.app['db'], request.user, device, port)
     url = request.app.router['port-update'].url(parts={'device': device})
     return web.HTTPFound(url)
+
+
+@aiohttp_jinja2.template('device/tasks.html')
+async def tasks(request):
+    context = dict()
+    context['active_tasks'] = await user_tasks(request.app['redis'],
+                                               request.app['db'],
+                                               request.user)
+    return context

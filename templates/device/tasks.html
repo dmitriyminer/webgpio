@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<ul>
+{% for task in active_tasks %}
+  <li>{{ task }}  {{ task.port }}</li>
+{% else %}
+  <p>There are no tasks</p>
+{% endfor %}
+</ul>
+{% endblock %}

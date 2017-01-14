@@ -19,6 +19,9 @@
     <ul class="nav navbar-nav float-sm-right">
       {% if request.user %}
       <li class="nav-item">
+        <a class="nav-link" href="{{ url('tasks') }}">Tasks</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{{ url('devices') }}">Devices</a>
       </li>
       <li class="nav-item">
