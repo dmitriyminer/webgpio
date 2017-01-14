@@ -123,6 +123,7 @@ async def device_add(request):
         return web.HTTPFound(url)
     return context
 
+
 async def device_delete(request):
     name = request.match_info['device']
     await sa_device_delete(request.app['db'], request.user, name)
@@ -160,8 +161,7 @@ async def task_add(request):
                                                device)
     if request.method == 'POST':
         data = await request.post()
-        if all([device_id is not None, data,
-                ]):
+        if device_id is not None and data:
             created = await device_task_add(request.app['redis'],
                                             request.app['db'],
                                             request.user,
