@@ -1,11 +1,48 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul>
-{% for task in active_tasks %}
-  <li>{{ task }}  {{ task.port }}</li>
-{% else %}
-  <p>There are no tasks</p>
-{% endfor %}
-</ul>
+  {% if active_tasks %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>Key</th>
+          <th>Port name</th>
+          <th>GPIO</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for task in active_tasks %}
+          <tr>
+            <td>
+              {{ task.task.timestamp | timestamp_format }}
+            </td>
+            <td>
+              #{{ task.task.device }}
+            </td>
+            <td>
+              {{ task.port.name }}
+
+            </td>
+            <td>
+              {{ task.port.gpio }}
+            </td>
+            <td>
+              {% if task.task.action == 'on' %}
+                <span class="status-connected">on</span>
+              {% elif task.task.action == 'off' %}
+                <span class="status-disconnected">off</span>
+              {% endif %}
+
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>There are no tasks</p>
+  {% endif %}
 {% endblock %}

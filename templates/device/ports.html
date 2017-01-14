@@ -3,6 +3,10 @@
 {% block content %}
 <h5>#{{device}}</h5>
 <div class="pull-right header-actions">
+  <a href="{{ url('task-add', parts={'device': device}) }}" class="btn btn-success">
+    <i class="fa fa-plus" aria-hidden="true"></i>
+    Create task
+  </a>
   <a href="{{ url('port-add', parts={'device': device}) }}" class="btn btn-success">
     <i class="fa fa-plus" aria-hidden="true"></i>
     Add new port

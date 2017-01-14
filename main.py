@@ -10,12 +10,12 @@ from aiopg.sa import create_engine
 from jinja2 import FileSystemLoader as JinjaLoader
 
 from auth.routes import setup_routes as setup_auth_routes
+from device.helpers import timestamp_format
 from device.routes import setup_routes as setup_device_routes
-from ws.routes import setup_routes as setup_ws_routes
 from middlewares import auth_middleware
 from routes import setup_routes
 from utils import load_config
-
+from ws.routes import setup_routes as setup_ws_routes
 
 ROOT_PATH = pathlib.Path(__file__).parent
 
@@ -34,10 +34,11 @@ def init_app():
     setup_logger('device.logger', 'device.log')
     setup_logger('ws.logger', 'ws.log')
     app = web.Application()
-    aiohttp_jinja2.setup(app,
-                         context_processors=(
-                             aiohttp_jinja2.request_processor,),
-                         loader=JinjaLoader(str(ROOT_PATH / 'templates')))
+    env = aiohttp_jinja2.setup(
+        app,
+        context_processors=(aiohttp_jinja2.request_processor,),
+                            loader=JinjaLoader(str(ROOT_PATH / 'templates')))
+    env.filters['timestamp_format'] = timestamp_format
     config_path = str(ROOT_PATH / 'config' / 'base.yaml')
     app['config'] = load_config(config_path)
     app['sockets'] = []

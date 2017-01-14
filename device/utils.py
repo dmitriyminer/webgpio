@@ -1,25 +1,11 @@
-import time
 import uuid
 from collections import namedtuple, deque
-
-REDIS_USER_TASK_KEY = 'user:{user}:tasks'
 
 TaskInfo = namedtuple('TaskInfo', ['timestamp', 'device', 'gpio', 'action'])
 
 
 def generate_key():
     return uuid.uuid4().hex.upper()[:8]
-
-
-async def device_status_update(redis, device):
-    async with redis.get() as conn:
-        await conn.set(f'STATUS_{device}', time.time())
-
-
-async def gather_redis_tasks(redis, user):
-    async with redis.get() as conn:
-        return await conn.zrangebyscore(
-            REDIS_USER_TASK_KEY.format(user=user), 0, float('+inf'))
 
 
 class RedisInfoTask:

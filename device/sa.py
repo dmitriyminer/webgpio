@@ -5,7 +5,8 @@ import time
 import sqlalchemy as sa
 
 from db import devices, ports
-from device.utils import generate_key, gather_redis_tasks, RedisInfoTask
+from device.redis import gather_redis_tasks
+from device.utils import generate_key, RedisInfoTask
 
 NUM_GPIO = 28
 STATUS_TIME = 60
@@ -183,6 +184,20 @@ async def sa_free_gpio(db, user, device):
             async for row in conn.execute(query):
                 used_ports.append(row.gpio)
     return [port for port in all_ports if port not in used_ports]
+
+
+async def sa_device_gpio(db, user, device):
+    used_ports = []
+    query = sa.select([devices]).where(
+        sa.and_(devices.c.key == device, devices.c.user_id == user))
+    async with db.acquire() as conn:
+        ret = await conn.execute(query)
+        obj = await ret.fetchone()
+        if obj is not None:
+            query = ports.select().where(ports.c.device_id == obj.id)
+            async for row in conn.execute(query):
+                used_ports.append(row.gpio)
+    return used_ports
 
 
 async def user_tasks(redis, db, user):

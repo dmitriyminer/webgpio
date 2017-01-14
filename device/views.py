@@ -3,10 +3,12 @@ import sqlalchemy as sa
 from aiohttp import web
 
 from db import devices
+from device.redis import device_task_add
 from device.sa import (sa_port_update, sa_device_delete, sa_port_delete,
                        sa_port_list, sa_device_list, sa_device_add,
                        sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
-                       sa_device_status, user_tasks)
+                       sa_device_status, user_tasks, sa_device_gpio,
+                       check_device_permissions)
 
 
 @aiohttp_jinja2.template('base.html')
@@ -142,4 +144,30 @@ async def tasks(request):
     context['active_tasks'] = await user_tasks(request.app['redis'],
                                                request.app['db'],
                                                request.user)
+    return context
+
+
+@aiohttp_jinja2.template('device/task_add.html')
+async def task_add(request):
+    device = request.match_info['device']
+    context = dict()
+    device_id = await check_device_permissions(request.app['db'],
+                                               request.user,
+                                               device)
+    if device_id is not None:
+        context['gpio'] = await sa_device_gpio(request.app['db'],
+                                               request.user,
+                                               device)
+    if request.method == 'POST':
+        data = await request.post()
+        if all([device_id is not None, data,
+                ]):
+            created = await device_task_add(request.app['redis'],
+                                            request.app['db'],
+                                            request.user,
+                                            device,
+                                            context['gpio'],
+                                            **data)
+            url = request.app.router['ports'].url(parts={'device': device})
+            return web.HTTPFound(url)
     return context

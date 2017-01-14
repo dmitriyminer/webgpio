@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% include 'datetimepicker.html' %}
+{% endblock %}
+
+{% block content %}
+<h3>Task add</h3>
+<div class="col-md-6 offset-md-3">
+  <form action="" method="post">
+    <div class="form-group">
+      <input class="flatpickr form-control" type="text"
+             placeholder="Select Date.." name="date">
+      </div>
+    <div class="form-group">
+      <label class="radio-inline">
+        <input id="actionOn" type="radio" name="action" value="on" checked>
+        <span>On</span>
+      </label>
+      <label class="radio-inline">
+        <input id="actionOff" type="radio" name="action" value="off">
+        <span>Off</span>
+      </label>
+    </div>
+    <div class="form-group">
+      <label for="gpio">GPIO</label>
+      <select name="gpio" id="gpio">
+        {% for item in gpio %}
+          <option value="{{ item }}">{{ item }}</option>
+        {% endfor %}
+      </select>
+      </div>
+    <button type="submit" class="btn btn-primary pull-right">Create</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    flatpickr(".flatpickr", {
+        enableTime: true,
+        enableSeconds: true,
+        time_24hr: true,
+        utc: true,
+        minuteIncrement: 1
+    });
+  </script>
+{% endblock %}
