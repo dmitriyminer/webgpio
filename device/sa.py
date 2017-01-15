@@ -194,10 +194,11 @@ async def sa_device_gpio(db, user, device):
         ret = await conn.execute(query)
         obj = await ret.fetchone()
         if obj is not None:
-            query = ports.select().where(ports.c.device_id == obj.id)
+            query = ports.select().where(ports.c.device_id == obj.id)\
+                .order_by(ports.c.gpio)
             async for row in conn.execute(query):
                 used_ports.append(row.gpio)
-    return sorted(used_ports)
+    return used_ports
 
 
 async def user_tasks(redis, db, user):
