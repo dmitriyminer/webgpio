@@ -2,8 +2,8 @@ import time
 from datetime import datetime
 
 REDIS_DEVICE_STATUS_KEY = 'STATUS_{device}'
-REDIS_USER_TASK_KEY = 'user:{user}:tasks'
-REDIS_DEVICE_TASK_KEY = '{timestamp}:{device}:{gpio}:{action}'
+REDIS_USER_TASK_KEY = 'USER:{user}:TASKS'
+REDIS_DEVICE_TASK_VALUE = '{timestamp}:{device}:{gpio}:{action}'
 REDIS_TASK_ACTIONS = ('on', 'off')
 
 
@@ -34,10 +34,10 @@ async def device_task_add(redis, db, user, device, gpio_ports=None, **kwargs):
         key = REDIS_USER_TASK_KEY.format(user=user)
         timestamp = datetime.strptime(kwargs.get('date'),
                                       '%Y-%m-%d %H:%M:%S').timestamp()
-        value = REDIS_DEVICE_TASK_KEY.format(timestamp=timestamp,
-                                             device=device,
-                                             gpio=gpio,
-                                             action=kwargs.get('action'))
+        value = REDIS_DEVICE_TASK_VALUE.format(timestamp=timestamp,
+                                               device=device,
+                                               gpio=gpio,
+                                               action=kwargs.get('action'))
         if kwargs.get('action') in REDIS_TASK_ACTIONS:
             async with redis.get() as conn:
                 created = await conn.zadd(key, timestamp, value)

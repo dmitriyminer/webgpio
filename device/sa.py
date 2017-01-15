@@ -197,7 +197,7 @@ async def sa_device_gpio(db, user, device):
             query = ports.select().where(ports.c.device_id == obj.id)
             async for row in conn.execute(query):
                 used_ports.append(row.gpio)
-    return used_ports
+    return sorted(used_ports)
 
 
 async def user_tasks(redis, db, user):

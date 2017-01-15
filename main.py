@@ -14,6 +14,7 @@ from device.helpers import timestamp_format
 from device.routes import setup_routes as setup_device_routes
 from middlewares import auth_middleware
 from routes import setup_routes
+from rq import rq_tasks
 from utils import load_config
 from ws.routes import setup_routes as setup_ws_routes
 
@@ -37,7 +38,7 @@ def init_app():
     env = aiohttp_jinja2.setup(
         app,
         context_processors=(aiohttp_jinja2.request_processor,),
-                            loader=JinjaLoader(str(ROOT_PATH / 'templates')))
+        loader=JinjaLoader(str(ROOT_PATH / 'templates')))
     env.filters['timestamp_format'] = timestamp_format
     config_path = str(ROOT_PATH / 'config' / 'base.yaml')
     app['config'] = load_config(config_path)
@@ -50,6 +51,7 @@ def init_app():
     app.on_startup.append(init_pg)
     app.on_startup.append(init_redis)
     app.on_startup.append(init_session)
+    app.on_startup.append(rq_tasks)
     app.on_cleanup.append(close_pg)
     app.on_cleanup.append(close_redis)
     app.on_shutdown.append(close_sockets)
