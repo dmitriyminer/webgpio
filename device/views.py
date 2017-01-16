@@ -9,6 +9,7 @@ from device.sa import (sa_port_update, sa_device_delete, sa_port_delete,
                        sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
                        sa_device_status, user_tasks, sa_device_gpio,
                        check_device_permissions)
+from device.utils import recurrence_values
 
 
 @aiohttp_jinja2.template('base.html')
@@ -171,3 +172,24 @@ async def task_add(request):
             url = request.app.router['ports'].url(parts={'device': device})
             return web.HTTPFound(url)
     return context
+
+
+@aiohttp_jinja2.template('device/task_recurrence_add.html')
+async def task_recurrence_add(request):
+    device = request.match_info['device']
+    context = dict()
+    device_id = await check_device_permissions(request.app['db'],
+                                               request.user,
+                                               device)
+    if device_id is not None:
+        context['gpio'] = await sa_device_gpio(request.app['db'],
+                                               request.user,
+                                               device)
+
+    return context
+
+
+async def task_recurrence_values(request):
+    data = await recurrence_values(request.query_string)
+
+    return web.json_response({"data": data})

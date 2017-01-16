@@ -8,7 +8,7 @@ from db import devices, ports
 from device.redis import gather_redis_tasks
 from device.utils import generate_key, RedisInfoTask
 
-NUM_GPIO = 28
+GPIO_PORTS = range(1, 27)
 STATUS_TIME = 60
 device_logger = logging.getLogger('device.logger')
 
@@ -172,7 +172,6 @@ async def sa_device_status(redis, objs, user):
 
 
 async def sa_free_gpio(db, user, device):
-    all_ports = range(1, NUM_GPIO+1)
     used_ports = []
     query = sa.select([devices]).where(
         sa.and_(devices.c.key == device, devices.c.user_id == user))
@@ -183,7 +182,7 @@ async def sa_free_gpio(db, user, device):
             query = ports.select().where(ports.c.device_id == obj.id)
             async for row in conn.execute(query):
                 used_ports.append(row.gpio)
-    return [port for port in all_ports if port not in used_ports]
+    return [port for port in GPIO_PORTS if port not in used_ports]
 
 
 async def sa_device_gpio(db, user, device):

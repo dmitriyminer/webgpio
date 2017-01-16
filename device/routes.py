@@ -1,6 +1,7 @@
 from .views import (home, device_list, port_list, port_update, device_edit,
                     device_delete, port_delete, device_add, port_add,
-                    port_edit, tasks, task_add)
+                    port_edit, tasks, task_add, task_recurrence_add,
+                    task_recurrence_values)
 
 
 def setup_routes(app):
@@ -23,3 +24,7 @@ def setup_routes(app):
                          port_edit, name='port-edit')
     app.router.add_route('*', '/device/{device}/task/add',
                          task_add, name='task-add')
+    app.router.add_route('*', '/device/{device}/task/recurrence/add',
+                         task_recurrence_add, name='task-recurrence-add')
+    app.router.add_get('/api/recurrence/values',
+                       task_recurrence_values, name='api-recurrence-values')

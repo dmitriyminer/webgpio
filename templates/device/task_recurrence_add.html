@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% include 'datetimepicker.html' %}
+{% endblock %}
+
+{% block content %}
+<h3>Add recurrence tasks</h3>
+<div class="col-md-5 offset-md-2">
+  <form class="form-horizontal" id="recurrenceForm" method="post">
+    <div class="form-group">
+      <input id="flatpickrStart" class="flatpickr form-control" type="text"
+             placeholder="Select start date.." name="start_date"
+             onchange="getRruleValues()">
+    </div>
+    <div class="form-group">
+      <input id="flatpickrEnd" class="flatpickr form-control" type="text"
+             placeholder="Select end date.." name="end_date"
+             onchange="getRruleValues()">
+    </div>
+    <div class="col-form-label">Frequency</div>
+    <div class="form-group">
+      {% for freq in ["yearly", "monthly", "weekly", "daily", "hourly", "minutely"] %}
+        <div>
+          <label>
+            <input type="radio" name="freq" value="{{ freq }}"
+                   onchange="getRruleValues()"
+                   {% if freq == 'yearly' %}checked{% endif %}>
+            <span>{{ freq | capitalize }}</span>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      <label for="count">Count</label>
+      <input id="count" type="number" class="form-control" name="count"
+             value="1" min="1" onchange="getRruleValues()">
+    </div>
+    <div class="form-group">
+      <label for="interval">Interval</label>
+      <input id="interval" type="number" class="form-control" name="interval"
+             value="1" min="1" onchange="getRruleValues()">
+    </div>
+
+    <div class="col-form-label">By weekday</div>
+    <div class="form-group">
+      {% for weekday in ["sunday", "monday", "tuesday", "wednesday",
+      "thursday", "friday", "saturday"] %}
+        <div>
+          <label>
+            <input type="checkbox" name="weekday" value="{{ weekday }}"
+                   onchange="getRruleValues()">
+            <span>{{ weekday | capitalize }}</span>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="col-form-label">By month</div>
+    <div class="form-group">
+      {% for month in ["january", "february", "march", "april", "may", "june",
+      "july", "august", "september", "october", "november", "december"] %}
+        <div>
+          <label>
+            <input type="checkbox" name="month" value="{{ month }}"
+                   onchange="getRruleValues()">
+            <span>{{ month | capitalize }}</span>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="col-form-label">Action</div>
+    <div class="form-group">
+      <label class="radio-inline">
+        <input id="actionOn" type="radio" name="action" value="on" checked>
+        <span>On</span>
+      </label>
+      <label class="radio-inline">
+        <input id="actionOff" type="radio" name="action" value="off">
+        <span>Off</span>
+      </label>
+    </div>
+
+    <div class="col-form-label">GPIO</div>
+    <div class="form-group">
+      <label class="radio-inline">
+        <select name="gpio" id="gpio">
+          {% for item in gpio %}
+            <option value="{{ item }}">{{ item }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      </div>
+    <button type="submit" class="btn btn-primary pull-right">Create</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    var flatpickrStart = flatpickr("#flatpickrStart", {
+        enableTime: true,
+        enableSeconds: true,
+        time_24hr: true,
+        utc: true,
+        minuteIncrement: 1
+    });
+    var d = new Date();
+    flatpickrStart.setDate(d.toUTCString());
+
+    var flatpickrEnd = flatpickr("#flatpickrEnd", {
+        enableTime: true,
+        enableSeconds: true,
+        time_24hr: true,
+        utc: true,
+        minuteIncrement: 1
+    });
+
+    function getRruleValues() {
+      var url = "{{ url('api-recurrence-values') }}";
+      var data = $('#recurrenceForm').serialize();
+      $.get(
+          url,
+          data,
+          function(data, status){
+            console.log(data, status);
+          }
+      )
+    }
+  </script>
+{% endblock %}
