@@ -8,3 +8,5 @@ SQLAlchemy==1.1.4
 trafaret==0.7.5
 alembic==0.8.9
 PyYAML==3.12
+python-dateutil==2.6.0
+
