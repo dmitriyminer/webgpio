@@ -10,9 +10,9 @@ async def auth_middleware(app, handler):
             return await handler(request)
 
         session = await get_session(request)
-        auth_coockie = request.cookies.get('AIOHTTP_SESSION')
+        auth_cookie = request.cookies.get('AIOHTTP_SESSION')
         async with app['redis'].get() as conn:
-            value = await conn.get(f'AIOHTTP_SESSION_{auth_coockie}')
+            value = await conn.get(f'AIOHTTP_SESSION_{auth_cookie}')
 
             try:
                 data = json.loads(value)
@@ -24,8 +24,8 @@ async def auth_middleware(app, handler):
         if session_user and session_user == redis_user:
             request.user = redis_user
             return await handler(request)
-        else:
-            url = request.app.router['login'].url()
-            return web.HTTPFound(url)
+
+        url = request.app.router['login'].url()
+        return web.HTTPFound(url)
 
     return middleware

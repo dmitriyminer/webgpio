@@ -6,7 +6,7 @@
 
 {% block content %}
 <h3>Add recurrence tasks</h3>
-<div class="col-md-5 offset-md-2">
+<div class="col-md-6 offset-md-1">
   <form class="form-horizontal" id="recurrenceForm" method="post">
     <div class="form-group">
       <input id="flatpickrStart" class="flatpickr form-control" type="text"
@@ -93,13 +93,30 @@
         </select>
       </label>
       </div>
+    <input type="hidden" name="rrules">
     <button type="submit" class="btn btn-primary pull-right">Create</button>
   </form>
+</div>
+<div class="col-md-5">
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Date</th>
+    </tr>
+    </thead>
+    <tbody id="tasks">
+    </tbody>
+  </table>
+</div>
 </div>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    var dateTasks = [];
+
     var flatpickrStart = flatpickr("#flatpickrStart", {
         enableTime: true,
         enableSeconds: true,
@@ -117,7 +134,18 @@
         utc: true,
         minuteIncrement: 1
     });
-
+    
+    function collectTable(data) {
+      var trHTML = '';
+      var tasksTable = $('#tasks');
+      tasksTable.children().remove();
+      $.each(data, function (i, item) {
+          trHTML += '<tr><td>' + (i + 1) + '</td><td>';
+          trHTML += new Date(Date.parse(data[i])).toUTCString() + '</td></tr>'
+      });
+      tasksTable.append(trHTML);
+    }
+    
     function getRruleValues() {
       var url = "{{ url('api-recurrence-values') }}";
       var data = $('#recurrenceForm').serialize();
@@ -125,7 +153,9 @@
           url,
           data,
           function(data, status){
-            console.log(data, status);
+            dateTasks = JSON.parse(data['data']);
+            $('input[name="rrules"]').val(dateTasks);
+            collectTable(dateTasks);
           }
       )
     }

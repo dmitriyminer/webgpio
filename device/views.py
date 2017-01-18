@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from aiohttp import web
 
 from db import devices
-from device.redis import device_task_add
+from device.redis import device_tasks_add
 from device.sa import (sa_port_update, sa_device_delete, sa_port_delete,
                        sa_port_list, sa_device_list, sa_device_add,
                        sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
@@ -163,14 +163,15 @@ async def task_add(request):
     if request.method == 'POST':
         data = await request.post()
         if device_id is not None and data:
-            created = await device_task_add(request.app['redis'],
-                                            request.app['db'],
-                                            request.user,
-                                            device,
-                                            context['gpio'],
-                                            **data)
+            await device_tasks_add(request.app['redis'],
+                                   request.app['db'],
+                                   request.user,
+                                   device,
+                                   context['gpio'],
+                                   **data)
             url = request.app.router['ports'].url(parts={'device': device})
             return web.HTTPFound(url)
+
     return context
 
 
@@ -185,6 +186,19 @@ async def task_recurrence_add(request):
         context['gpio'] = await sa_device_gpio(request.app['db'],
                                                request.user,
                                                device)
+        if request.method == 'POST':
+            data = await request.post()
+
+            await device_tasks_add(request.app['redis'],
+                                   request.app['db'],
+                                   request.user,
+                                   device,
+                                   context['gpio'],
+                                   date=data['rrules'],
+                                   **data)
+
+            url = request.app.router['ports'].url(parts={'device': device})
+            return web.HTTPFound(url)
 
     return context
 

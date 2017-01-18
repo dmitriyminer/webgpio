@@ -47,10 +47,9 @@ async def recurrence_values(query_string):
         end_date = datetime.strptime(end_date, '%Y-%m-%d %H:%M:%S')
 
     if str(count).isdigit():
-        count = int(count or 1)
-        count = MAX_RRULE_COUNT if count > MAX_RRULE_COUNT else count
+        count = MAX_RRULE_COUNT if int(count) > MAX_RRULE_COUNT else int(count)
     else:
-        count = 1
+        count = 0
 
     if str(interval).isdigit():
         interval = int(interval or 1)
@@ -79,13 +78,16 @@ async def recurrence_values(query_string):
     bymonth = [month_map.get(m) for m in month]
     byweekday = [weekday_map.get(d) for d in weekday]
 
-    values = rrule.rrule(freq=freq_map.get(freq, rrule.YEARLY),
-                         dtstart=start_date,
-                         until=end_date,
-                         count=count,
-                         bymonth=bymonth,
-                         byweekday=byweekday,
-                         interval=interval)
-    result = [obj.isoformat() for obj in values]
+    if count != 0:
+        values = rrule.rrule(freq=freq_map.get(freq, rrule.YEARLY),
+                             dtstart=start_date,
+                             until=end_date,
+                             count=count,
+                             bymonth=bymonth,
+                             byweekday=byweekday,
+                             interval=interval)
+        result = [obj.isoformat() for obj in values]
+    else:
+        result = []
 
     return json.dumps(result)
