@@ -4,56 +4,85 @@ containers:
     - !Ubuntu xenial
     - !AptTrust keys: [F06FC659]
     - !UbuntuPPA jonathonf/python-3.6
-    - !Install [libpq-dev, python3.6, libc6-dev, libpython3.6-dev, libpython3.6]
-    - !PipConfig {dependencies: true, python-exe: python3.6}
-    - !Py3Requirements "requirements/base.txt"
+    - !Install [libpq-dev, &python_ver python3.6, libc6-dev, libpython3.6-dev, libpython3.6]
+    - !Sh ln -sf /usr/bin/python3.6m /usr/bin/python3m
+    - !Sh ln -sf /usr/bin/python3.6 /usr/bin/python3
+    - !Sh ln -sf /usr/bin/python3 /usr/bin/python
+    - !PipConfig
+      # Don't install python3.5
+      install-python: false
+      dependencies: true
+      # It doesn't seem to locate python3.6 if python-exe isn't specified
+      python-exe: *python_ver
+    - !Py3Requirements requirements/base.txt
     - !Py3Install [setuptools]
-  
+
   redis:
     setup:
     - !Alpine v3.5
     - !Install [redis]
-  
+
   postgres:
-    setup:
-    - !Ubuntu xenial
-    - !Install [postgresql]
-    - !EnsureDir /data
-    environ:
+    environ: &pg_env_vars
       PG_PORT: 5432
       PG_DB: webgpio
       PG_USER: gpio
       PG_PASSWORD: gpio
       PGDATA: /data
       PG_BIN: /usr/lib/postgresql/9.5/bin
+    setup:
+    - !Env
+      <<: *pg_env_vars
+    - !Ubuntu xenial
+    - !Sh addgroup --system --gid 200 postgres
+    - !Sh |
+        adduser --uid 200 --system --home "$PGDATA" --no-create-home \
+                --shell /bin/bash --group --gecos "PostgreSQL administrator" \
+                postgres
+    # Installation of postgres MUST go after user creation,
+    # otherwise it will fail
+    - !Install [postgresql-9.5]
+    - !EnsureDir /data
     volumes:
-      /data: !Tmpfs
-        size: 100M
-        mode: 0o700
+      /data: !Persistent
+        name: pg-data
+        owner-uid: 200
+        owner-gid: 200
+        init-command: _init-pg
 
 commands:
+  _init-pg: !Command
+    description: Initialize postgresql database
+    container: postgres
+    user-id: 200
+    group-id: 200
+    run: |
+      set -ex
+      ls -la /data
+      $PG_BIN/pg_ctl initdb
+      $PG_BIN/pg_ctl -w -o '-F --port=$PG_PORT -k $PGDATA' start
+      $PG_BIN/createuser -h 127.0.0.1 -p $PG_PORT $PG_USER
+      $PG_BIN/createdb -h 127.0.0.1 -p $PG_PORT $PG_DB -O $PG_USER
+      $PG_BIN/psql -h 127.0.0.1 -p $PG_PORT -c "ALTER ROLE $PG_USER WITH ENCRYPTED PASSWORD '$PG_PASSWORD';"
+      $PG_BIN/pg_ctl stop
+
   run: !Supervise
     description: Run app
+    mode: stop-on-failure
     children:
       _app: !Command
         container: webgpio
         run: |
-            touch /work/.dbcreation # Create lock file
-            while [ -f /work/.dbcreation ]; do sleep 0.2; done # Acquire lock
-            alembic upgrade head
-            gunicorn -b 0.0.0.0:8080 -k aiohttp.worker.GunicornWebWorker -w 1 -t 60 --reload main:server
+          alembic upgrade head
+          gunicorn -b 0.0.0.0:8080 \
+                   -k aiohttp.worker.GunicornWebWorker \
+                   -w 1 -t 60 \
+                   --reload main:server
       _postgres: !Command
         container: postgres
-        run: |
-            chown postgres:postgres $PGDATA;
-            su postgres -c "$PG_BIN/pg_ctl initdb";
-            su postgres -c "echo 'host all all all trust' >> $PGDATA/pg_hba.conf"
-            su postgres -c "$PG_BIN/pg_ctl -w -o '-F --port=$PG_PORT -k /tmp' start";
-            su postgres -c "$PG_BIN/psql -h 127.0.0.1 -p $PG_PORT -c \"CREATE USER $PG_USER WITH PASSWORD '$PG_PASSWORD';\""
-            su postgres -c "$PG_BIN/createdb -h 127.0.0.1 -p $PG_PORT $PG_DB -O $PG_USER";
-            rm /work/.dbcreation # Release lock
-            sleep infinity
+        user-id: 200
+        group-id: 200
+        run: exec $PG_BIN/postgres -F --port=$PG_PORT -k $PGDATA
       _redis: !Command
         container: redis
-        run: "redis-server"
-
+        run: [redis-server]
