@@ -66,23 +66,46 @@ commands:
       $PG_BIN/psql -h 127.0.0.1 -p $PG_PORT -c "ALTER ROLE $PG_USER WITH ENCRYPTED PASSWORD '$PG_PASSWORD';"
       $PG_BIN/pg_ctl stop
 
+  run-app: &run-app-cmd !Command
+    container: webgpio
+    run: |
+      alembic upgrade head
+      gunicorn -b 0.0.0.0:8080 \
+               -k aiohttp.worker.GunicornWebWorker \
+               -w 1 -t 60 \
+               --reload main:server
+
+  run-db: &run-db-cmd !Command
+    container: postgres
+    user-id: 200
+    group-id: 200
+    run: exec $PG_BIN/postgres -F --port=$PG_PORT -k $PGDATA
+
+  redis-server: &run-redis-cmd !Command
+    description: Exposes redis-server you may add arguments you want
+    container: redis
+    run: [redis-server]
+
+  redis-cli: !Command
+    description: Exposes redis CLI you may add arguments you want
+    container: redis
+    run: [redis-cli]
+
+  db-cli: !Command
+    container: postgres
+    user-id: 200
+    group-id: 200
+    run: psql --port=$PG_PORT --host=localhost
+
+  alembic: !Command
+    container: webgpio
+    description: Exposes alembic CLI you may add arguments you want
+    run: [alembic]
+
   run: !Supervise
     description: Run app
     mode: stop-on-failure
     children:
-      _app: !Command
-        container: webgpio
-        run: |
-          alembic upgrade head
-          gunicorn -b 0.0.0.0:8080 \
-                   -k aiohttp.worker.GunicornWebWorker \
-                   -w 1 -t 60 \
-                   --reload main:server
-      _postgres: !Command
-        container: postgres
-        user-id: 200
-        group-id: 200
-        run: exec $PG_BIN/postgres -F --port=$PG_PORT -k $PGDATA
-      _redis: !Command
-        container: redis
-        run: [redis-server]
+      _app: *run-app-cmd
+      _postgres: *run-db-cmd
+      _redis: *run-redis-cmd
