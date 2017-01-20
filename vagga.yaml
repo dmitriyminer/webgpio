@@ -8,12 +8,12 @@ containers:
     - !PipConfig {dependencies: true, python-exe: python3.6}
     - !Py3Requirements "requirements/base.txt"
     - !Py3Install [setuptools]
-  
+
   redis:
     setup:
     - !Alpine v3.5
     - !Install [redis]
-  
+
   postgres:
     setup:
     - !Ubuntu xenial
@@ -56,4 +56,3 @@ commands:
       _redis: !Command
         container: redis
         run: "redis-server"
-

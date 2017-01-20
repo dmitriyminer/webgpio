@@ -1,0 +1,14 @@
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    sha: 9ba5af45ce2d29b64c9a348a6fcff5553eea1f2c
+    hooks:
+    -   id: flake8
+    -   id: trailing-whitespace
+    -   id: check-merge-conflict
+    -   id: double-quote-string-fixer
+    -   id: check-added-large-files
+    -   id: check-docstring-first
+    -   id: check-yaml
+        exclude: vagga.yaml
+    -   id: end-of-file-fixer
+    -   id: debug-statements
+    -   id: requirements-txt-fixer

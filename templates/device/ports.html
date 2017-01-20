@@ -34,10 +34,10 @@
         <td>{{ port.gpio }}</td>
         <td>{{ port.name }}</td>
         <td>
-          <input type='checkbox' name='gpio_{{ port.gpio }}_{{ device }}' 
+          <input type='checkbox' name='gpio_{{ port.gpio }}_{{ device }}'
                  onchange="setHiddenStatus(this)"
                  {% if port.status %}checked{% endif %}>
-          <input type='hidden' id="gpio_{{ port.gpio }}_{{ device }}" 
+          <input type='hidden' id="gpio_{{ port.gpio }}_{{ device }}"
                  name='status_{{ port.gpio }}_{{ device }}'
                  value='{% if port.status %}on{% else %}off{% endif %}'>
         </td>

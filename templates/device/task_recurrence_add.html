@@ -134,7 +134,7 @@
         utc: true,
         minuteIncrement: 1
     });
-    
+
     function collectTable(data) {
       var trHTML = '';
       var tasksTable = $('#tasks');
@@ -145,7 +145,7 @@
       });
       tasksTable.append(trHTML);
     }
-    
+
     function getRruleValues() {
       var url = "{{ url('api-recurrence-values') }}";
       var data = $('#recurrenceForm').serialize();

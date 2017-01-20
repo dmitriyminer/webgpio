@@ -1,7 +1,7 @@
 """create tables
 
 Revision ID: eff453bf5960
-Revises: 
+Revises:
 Create Date: 2016-12-25 01:18:25.912212
 
 """

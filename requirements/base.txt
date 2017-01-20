@@ -1,12 +1,11 @@
+PyYAML==3.12
+SQLAlchemy==1.1.4
 aiohttp==1.2.0
 aiohttp-jinja2==0.13.0
 aiohttp-session==0.8.0
 aiopg==0.13.0
 aioredis==0.2.9
-gunicorn==19.6.0
-SQLAlchemy==1.1.4
-trafaret==0.7.5
 alembic==0.8.9
-PyYAML==3.12
+gunicorn==19.6.0
 python-dateutil==2.6.0
-
+trafaret==0.7.5

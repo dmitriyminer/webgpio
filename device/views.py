@@ -206,4 +206,4 @@ async def task_recurrence_add(request):
 async def task_recurrence_values(request):
     data = await recurrence_values(request.query_string)
 
-    return web.json_response({"data": data})
+    return web.json_response({'data': data})

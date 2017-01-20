@@ -73,6 +73,7 @@ class WebGPIOClient:
                     self._current_status[gpio] = status
                     GPIO.output(gpio, status)
 
+
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     try:
