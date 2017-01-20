@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/dmitriyminer/webgpio.svg?branch=master)](https://travis-ci.org/dmitriyminer/webgpio)
 ## webgpio (GPIO web control)
 Run development server:
 ```
