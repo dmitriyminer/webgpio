@@ -24,12 +24,10 @@ async def device_tasks_add(redis, db, user, device, gpios=None, **kwargs):
 
     try:
         gpio = int(kwargs.get('gpio'))
-        assert gpio in gpios
     except (TypeError, ValueError):
-        pass
-    except AssertionError:
-        pass
-    else:
+        gpio = 0
+
+    if gpio in gpios:
         timestamps = kwargs.get('date', '').split(',')
 
         key = REDIS_USER_TASK_KEY.format(user=user)

@@ -14,7 +14,7 @@ containers:
       dependencies: true
       # It doesn't seem to locate python3.6 if python-exe isn't specified
       python-exe: *python_ver
-    - !Py3Requirements webgpio/requirements/base.txt
+    - !Py3Requirements requirements/base.txt
     - !Py3Install [setuptools]
 
   redis:
