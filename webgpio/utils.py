@@ -4,7 +4,7 @@ import yaml
 
 def load_config(f):
     with open(f) as opened:
-        data = yaml.load(opened)
+        data = yaml.safe_load(opened)
 
     t.Bool().check(data.get('DEBUG'))
     t.String().check(data.get('host'))
