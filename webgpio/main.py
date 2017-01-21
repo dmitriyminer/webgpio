@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import pathlib
 
@@ -5,10 +6,10 @@ import aiohttp_jinja2
 import aioredis
 from aiohttp import web
 from aiohttp_session import session_middleware
+from aiohttp_session.redis_storage import RedisStorage
 from aiopg.sa import create_engine
 from jinja2 import FileSystemLoader as JinjaLoader
 
-from webgpio.session import CustomRedisStorage
 from .auth.routes import setup_routes as setup_auth_routes
 from .device.helpers import timestamp_format
 from .device.routes import setup_routes as setup_device_routes
@@ -32,15 +33,23 @@ def setup_logger(name, filename):
 
 
 def init_app():
+    conf = load_config(CONFIG_PATH)
     setup_logger('auth.logger', 'auth.log')
     setup_logger('device.logger', 'device.log')
     setup_logger('ws.logger', 'ws.log')
-    app = web.Application()
+
+    # init redis pool first, need for RedisStorage in session_middleware
+    loop = asyncio.get_event_loop()
+    redis_pool = loop.run_until_complete(init_redis(conf))
+
+    app = web.Application(loop=loop)
+
     app.middlewares.append(
-        session_middleware(CustomRedisStorage(redis_pool=None,
-                                              max_age=30 * 24 * 3600))
+        session_middleware(RedisStorage(redis_pool=redis_pool,
+                                        max_age=30 * 24 * 3600))
     )
     app.middlewares.append(auth_middleware)
+
     env = aiohttp_jinja2.setup(
         app,
         context_processors=(aiohttp_jinja2.request_processor,),
@@ -49,7 +58,8 @@ def init_app():
     # add aiohttp_jinja2 filter
     env.filters['timestamp_format'] = timestamp_format
 
-    app['config'] = load_config(CONFIG_PATH)
+    app['redis'] = redis_pool
+    app['config'] = conf
     app['sockets'] = []
     setup_routes(app)
     setup_auth_routes(app)
@@ -57,7 +67,6 @@ def init_app():
     setup_ws_routes(app)
 
     app.on_startup.append(init_pg)
-    app.on_startup.append(init_redis)
     app.on_startup.append(rq_tasks)
     app.on_cleanup.append(close_pg)
     app.on_cleanup.append(close_redis)
@@ -86,11 +95,10 @@ async def close_pg(app):
     await app['db'].wait_closed()
 
 
-async def init_redis(app):
-    conf = app['config']
+async def init_redis(conf):
     pool = await aioredis.create_pool((conf['redis_host'],
                                        conf['redis_port']))
-    app['redis'] = pool
+    return pool
 
 
 async def close_redis(app):
