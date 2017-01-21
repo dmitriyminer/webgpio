@@ -4,6 +4,7 @@ from aiohttp_session import get_session
 
 
 async def auth_middleware(app, handler):
+
     async def middleware(request):
         if any([request.path.startswith(path)
                 for path in ('/login', '/register', '/static')]):

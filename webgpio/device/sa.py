@@ -4,9 +4,9 @@ import time
 
 import sqlalchemy as sa
 
-from db import devices, ports
-from device.redis import gather_redis_tasks
-from device.utils import generate_key, RedisInfoTask
+from webgpio.db import devices, ports
+from .redis import gather_redis_tasks
+from .utils import generate_key, RedisInfoTask
 
 GPIO_PORTS = range(1, 27)
 STATUS_TIME = 60

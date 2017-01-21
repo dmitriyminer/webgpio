@@ -2,14 +2,14 @@ import aiohttp_jinja2
 import sqlalchemy as sa
 from aiohttp import web
 
-from db import devices
-from device.redis import device_tasks_add
-from device.sa import (sa_port_update, sa_device_delete, sa_port_delete,
-                       sa_port_list, sa_device_list, sa_device_add,
-                       sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
-                       sa_device_status, user_tasks, sa_device_gpio,
-                       check_device_permissions)
-from device.utils import recurrence_values
+from webgpio.db import devices
+from .redis import device_tasks_add
+from .sa import (sa_port_update, sa_device_delete, sa_port_delete,
+                 sa_port_list, sa_device_list, sa_device_add,
+                 sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
+                 sa_device_status, user_tasks, sa_device_gpio,
+                 check_device_permissions)
+from .utils import recurrence_values
 
 
 @aiohttp_jinja2.template('base.html')

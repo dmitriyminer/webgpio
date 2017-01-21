@@ -1,7 +1,7 @@
 import crypt
 from hmac import compare_digest
 
-from db import users
+from webgpio.db import users
 
 
 async def check_password(db, config, **kwargs):

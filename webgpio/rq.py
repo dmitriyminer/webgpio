@@ -3,9 +3,9 @@ import time
 
 import sqlalchemy as sa
 
-from db import users, ports, devices
-from device.redis import REDIS_USER_TASK_KEY
-from device.utils import TaskInfo
+from .db import users, ports, devices
+from .device.redis import REDIS_USER_TASK_KEY
+from .device.utils import TaskInfo
 
 RQ_UPDATE_TIME = 1
 
