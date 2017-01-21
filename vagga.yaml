@@ -14,7 +14,7 @@ containers:
       dependencies: true
       # It doesn't seem to locate python3.6 if python-exe isn't specified
       python-exe: *python_ver
-    - !Py3Requirements requirements/base.txt
+    - !Py3Requirements webgpio/requirements/base.txt
     - !Py3Install [setuptools]
 
   redis:
@@ -73,7 +73,7 @@ commands:
       gunicorn -b 0.0.0.0:8080 \
                -k aiohttp.worker.GunicornWebWorker \
                -w 1 -t 60 \
-               --reload main:server
+               --reload webgpio.server:app
 
   run-db: &run-db-cmd !Command
     container: postgres

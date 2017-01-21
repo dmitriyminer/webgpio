@@ -25,7 +25,7 @@ async def device_tasks_add(redis, db, user, device, gpios=None, **kwargs):
     try:
         gpio = int(kwargs.get('gpio'))
         assert gpio in gpios
-    except ValueError:
+    except (TypeError, ValueError):
         pass
     except AssertionError:
         pass

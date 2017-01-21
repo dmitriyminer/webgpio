@@ -3,8 +3,8 @@ import logging
 import aiohttp
 from aiohttp import web
 
-from device.redis import device_status_update
-from device.sa import check_device_permissions, sa_port_status
+from webgpio.device.redis import device_status_update
+from webgpio.device.sa import check_device_permissions, sa_port_status
 
 ws_logger = logging.getLogger('ws.logger')
 
