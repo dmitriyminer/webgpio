@@ -21,27 +21,29 @@ async def gather_redis_tasks(redis, user):
 
 async def device_tasks_add(redis, db, user, device, gpios=None, **kwargs):
     gpios = gpios or []
+    action = kwargs.get('action')
 
     try:
         gpio = int(kwargs.get('gpio'))
     except (TypeError, ValueError):
         gpio = 0
 
-    if gpio in gpios:
-        timestamps = kwargs.get('date', '').split(',')
+    if gpio in gpios and action in REDIS_TASK_ACTIONS:
+        dt_stamps = kwargs.get('date', '').split(',')
+
+        # try to validate timestamps
+        try:
+            timestamps = [datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+                          for date in dt_stamps]
+        except ValueError:
+            timestamps = []
 
         key = REDIS_USER_TASK_KEY.format(user=user)
-        action = kwargs.get('action')
-
-        if action in REDIS_TASK_ACTIONS:
-            async with redis.get() as conn:
-
-                for timestamp in timestamps:
-                    tm_stamp = datetime.strptime(
-                        timestamp, '%Y-%m-%dT%H:%M:%S').timestamp()
-
-                    value = REDIS_DEVICE_TASK_VALUE.format(timestamp=tm_stamp,
-                                                           device=device,
-                                                           gpio=gpio,
-                                                           action=action)
-                    await conn.zadd(key, tm_stamp, value)
+        async with redis.get() as conn:
+            for timestamp in timestamps:
+                tm_stamp = timestamp.timestamp()
+                value = REDIS_DEVICE_TASK_VALUE.format(timestamp=tm_stamp,
+                                                       device=device,
+                                                       gpio=gpio,
+                                                       action=action)
+                await conn.zadd(key, tm_stamp, value)

@@ -7,7 +7,7 @@
 {% block content %}
 <h3>Task add</h3>
 <div class="col-md-6 offset-md-3">
-  <form action="" method="post">
+  <form name="taskForm" action="" method="post" onsubmit="prepareDate()">
     <div class="form-group">
       <input class="flatpickr form-control" type="text"
              placeholder="Select Date.." name="date">
@@ -37,12 +37,19 @@
 
 {% block scripts %}
   <script>
-    flatpickr(".flatpickr", {
+    var flatpickrDate = flatpickr(".flatpickr", {
         enableTime: true,
         enableSeconds: true,
         time_24hr: true,
         utc: true,
         minuteIncrement: 1
     });
+    var d = new Date();
+    flatpickrDate.setDate(d.toUTCString());
+    function prepareDate() {
+      var date_input = document.forms.taskForm.date;
+      var splited = (date_input.value).split(' ');
+      date_input.value = splited[0] + 'T' + splited[1];
+    }
   </script>
 {% endblock %}
