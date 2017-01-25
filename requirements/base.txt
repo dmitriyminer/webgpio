@@ -8,4 +8,5 @@ aioredis==0.2.9
 alembic==0.8.9
 gunicorn==19.6.0
 python-dateutil==2.6.0
+python-dotenv==0.6.2
 trafaret==0.7.5

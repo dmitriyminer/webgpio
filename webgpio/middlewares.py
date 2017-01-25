@@ -2,6 +2,8 @@ import json
 from aiohttp import web
 from aiohttp_session import get_session
 
+from webgpio.constants import AIOHTTP_SESSION
+
 
 async def auth_middleware(app, handler):
 
@@ -11,9 +13,9 @@ async def auth_middleware(app, handler):
             return await handler(request)
 
         session = await get_session(request)
-        auth_cookie = request.cookies.get('AIOHTTP_SESSION')
+        auth_cookie = request.cookies.get(AIOHTTP_SESSION)
         async with app['redis'].get() as conn:
-            value = await conn.get(f'AIOHTTP_SESSION_{auth_cookie}')
+            value = await conn.get(f'{AIOHTTP_SESSION}_{auth_cookie}')
 
             try:
                 data = json.loads(value)

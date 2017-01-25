@@ -6,8 +6,9 @@ from urllib import parse
 
 from dateutil import rrule
 
+from webgpio.constants import MAX_RRULE_COUNT
+
 TaskInfo = namedtuple('TaskInfo', ['timestamp', 'device', 'gpio', 'action'])
-MAX_RRULE_COUNT = 100
 
 
 def generate_key():

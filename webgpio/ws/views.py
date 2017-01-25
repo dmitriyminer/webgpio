@@ -3,6 +3,7 @@ import logging
 import aiohttp
 from aiohttp import web
 
+from webgpio.constants import AIOHTTP_SESSION
 from webgpio.device.redis import device_status_update
 from webgpio.device.sa import check_device_permissions, sa_port_status
 
@@ -27,7 +28,7 @@ async def gpio_status(request):
             elif msg.data == 'status':
 
                 ws_logger.info('%s %s' % (
-                    msg.data, request.cookies.get('AIOHTTP_SESSION')))
+                    msg.data, request.cookies.get(AIOHTTP_SESSION)))
 
                 resp = await sa_port_status(request.app['db'], device)
                 ws.send_str(resp)

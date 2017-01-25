@@ -4,12 +4,11 @@ import time
 
 import sqlalchemy as sa
 
+from webgpio.constants import GPIO_PORTS, STATUS_TIME
 from webgpio.db import devices, ports
 from .redis import gather_redis_tasks
 from .utils import generate_key, RedisInfoTask
 
-GPIO_PORTS = range(1, 27)
-STATUS_TIME = 60
 device_logger = logging.getLogger('device.logger')
 
 

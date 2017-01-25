@@ -1,0 +1,12 @@
+AIOHTTP_SESSION = 'AIOHTTP_SESSION'
+
+GPIO_PORTS = range(2, 27)
+
+MAX_RRULE_COUNT = 100
+
+REDIS_DEVICE_STATUS_KEY = 'STATUS_{device}'
+REDIS_DEVICE_TASK_VALUE = '{timestamp}:{device}:{gpio}:{action}'
+REDIS_TASK_ACTIONS = ('on', 'off')
+REDIS_USER_TASK_KEY = 'USER:{user}:TASKS'
+
+STATUS_TIME = 60

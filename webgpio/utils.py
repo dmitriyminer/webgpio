@@ -1,10 +1,21 @@
+import os
+import pathlib
+
 import trafaret as t
 import yaml
+from dotenv import load_dotenv
+
+EXAMPLE_SECRET = 'CO8-hNHdHZ8fK-VjZgBf0OWQ-fFSCwP1T-u1cLSPeV8='
 
 
 def load_config(f):
+    env_path = str(pathlib.Path(__file__).parent / '.env')
+    load_dotenv(env_path)
+
     with open(f) as opened:
         data = yaml.safe_load(opened)
+
+    data['SECRET_KEY'] = os.environ.get('SECRET_KEY') or EXAMPLE_SECRET
 
     t.Bool().check(data.get('DEBUG'))
     t.String().check(data.get('host'))
