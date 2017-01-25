@@ -41,9 +41,19 @@ async def device_tasks_add(redis, db, user, device, gpios=None, **kwargs):
         key = REDIS_USER_TASK_KEY.format(user=user)
         async with redis.get() as conn:
             for timestamp in timestamps:
-                tm_stamp = timestamp.timestamp()
+                tm_stamp = int(timestamp.timestamp())
                 value = REDIS_DEVICE_TASK_VALUE.format(timestamp=tm_stamp,
                                                        device=device,
                                                        gpio=gpio,
                                                        action=action)
                 await conn.zadd(key, tm_stamp, value)
+
+
+async def device_task_delete(redis, user, value):
+
+    key = REDIS_USER_TASK_KEY.format(user=user)
+    ret = None
+    async with redis.get() as conn:
+        ret = await conn.zrem(key, value)
+
+    return ret

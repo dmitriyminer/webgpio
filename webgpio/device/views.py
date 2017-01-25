@@ -3,13 +3,13 @@ import sqlalchemy as sa
 from aiohttp import web
 
 from webgpio.db import devices
-from .redis import device_tasks_add
+from .redis import device_tasks_add, device_task_delete
 from .sa import (sa_port_update, sa_device_delete, sa_port_delete,
                  sa_port_list, sa_device_list, sa_device_add,
                  sa_port_add, sa_free_gpio, sa_port, sa_port_edit,
                  sa_device_status, user_tasks, sa_device_gpio,
                  check_device_permissions)
-from .utils import recurrence_values
+from .utils import recurrence_values, TaskInfo
 
 
 @aiohttp_jinja2.template('base.html')
@@ -207,3 +207,26 @@ async def task_recurrence_values(request):
     data = await recurrence_values(request.query_string)
 
     return web.json_response({'data': data})
+
+
+async def task_delete(request):
+    data = await request.post()
+    status = 'error'
+    value = data.get('task')
+
+    if value:
+        splited = value.split(':')
+        task = TaskInfo(*splited)
+        device_id = await check_device_permissions(request.app['db'],
+                                                   request.user,
+                                                   task.device)
+        if device_id is not None:
+            ret = await device_task_delete(request.app['redis'],
+                                           request.user,
+                                           value)
+            if ret:
+                status = 'ok'
+        else:
+            status = 'Permission denied'
+
+    return web.json_response({'status': status})
