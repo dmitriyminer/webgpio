@@ -13,7 +13,7 @@ from jinja2 import FileSystemLoader as JinjaLoader
 from .auth.routes import setup_routes as setup_auth_routes
 from .device.helpers import timestamp_format
 from .device.routes import setup_routes as setup_device_routes
-from .middlewares import auth_middleware
+from .middlewares import auth_middleware, error_middleware
 from .routes import setup_routes
 from .rq import rq_tasks
 from .utils import load_config
@@ -44,6 +44,7 @@ def init_app():
 
     app = web.Application(loop=loop)
 
+    app.middlewares.append(error_middleware)
     app.middlewares.append(
         session_middleware(RedisStorage(redis_pool=redis_pool,
                                         max_age=30 * 24 * 3600))
