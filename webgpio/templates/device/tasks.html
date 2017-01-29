@@ -11,11 +11,12 @@
           <th>Port name</th>
           <th>GPIO</th>
           <th>Action</th>
+          <th>Cancel</th>
         </tr>
         </thead>
         <tbody>
         {% for task in active_tasks %}
-          <tr>
+          <tr id="{{ task.task.timestamp }}:{{ task.task.device }}:{{ task.task.gpio }}:{{ task.task.action }}">
             <td>
               {{ task.task.timestamp | timestamp_format }}
             </td>
@@ -35,6 +36,12 @@
                 <span class="status-disconnected">off</span>
               {% endif %}
             </td>
+            <td>
+              <a href="" data-task-value="{{ task.task.timestamp }}:{{ task.task.device }}:{{ task.task.gpio }}:{{ task.task.action }}"
+                onclick="deleteTask(this); return false;">
+                <i class="fa fa-trash-o" aria-hidden="true"></i>
+              </a>
+            </td>
           </tr>
         {% endfor %}
         </tbody>
@@ -43,4 +50,28 @@
   {% else %}
     <p>There are no tasks</p>
   {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function deleteTask(element) {
+      var value = element.dataset.taskValue;
+      $.ajax({
+        type: 'POST',
+        url: "{{ url('api-task-delete') }}",
+        data: {
+          'task': value
+        },
+        dataType: 'json',
+        success: function (resp) {
+          if ( resp['status'] == 'ok' ) {
+            var toRemove = document.getElementById(value);
+            $( toRemove ).fadeTo(1000, 0.1, function(){
+              $( toRemove ).remove()
+            })
+          }
+        }
+      });
+    }
+  </script>
 {% endblock %}

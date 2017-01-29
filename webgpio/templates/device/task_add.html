@@ -48,8 +48,7 @@
     flatpickrDate.setDate(d.toUTCString());
     function prepareDate() {
       var date_input = document.forms.taskForm.date;
-      var splited = (date_input.value).split(' ');
-      date_input.value = splited[0] + 'T' + splited[1];
+      date_input.value = date_input.value.replace(' ', 'T')
     }
   </script>
 {% endblock %}
