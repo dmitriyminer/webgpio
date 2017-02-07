@@ -22,7 +22,7 @@ cache:
    - .vagga/.mnt
    - .vagga/.transient
 
-before_install: 'echo ubuntu-mirror: http://mirrors.us.kernel.org/ubuntu/ > ~/.vagga.yaml'
+before_install: 'echo alpine-mirror: http://mirrors.gigenet.com/alpinelinux/ > ~/.vagga.yaml'
 
 install: vagga _build test
 
