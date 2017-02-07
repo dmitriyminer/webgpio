@@ -1,11 +1,30 @@
 language: python
-python:
-    - "3.6"
+python: 3.6
 
-env:
-    - TOX_ENV=py36
+matrix:
+  fast_finish: true
 
-install:
-    - pip install tox
+dist: trusty
+sudo: required
 
-script: tox -e $TOX_ENV
+addons:
+  apt:
+    packages: [vagga]
+    sources:
+      - sourceline: >-
+          deb [arch=amd64 trusted=yes] http://ubuntu.zerogw.com vagga-testing main
+
+cache:
+  timeout: 3600
+  pip: true
+  directories:
+   - .vagga/.roots
+   - .vagga/.mnt
+   - .vagga/.transient
+
+before_install: 'echo ubuntu-mirror: http://mirrors.us.kernel.org/ubuntu/ > ~/.vagga.yaml'
+
+install: vagga _build test
+
+script:
+  - vagga lint

@@ -1,7 +1,8 @@
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 63142f2d4ece8fd67cad3521c6e0c0f2bfef1c03
+    sha: 46251c9523506b68419aefdf5ff6ff2fbc4506a4
     hooks:
     -   id: flake8
+    -   id: debug-statements
     -   id: trailing-whitespace
     -   id: check-merge-conflict
     -   id: double-quote-string-fixer

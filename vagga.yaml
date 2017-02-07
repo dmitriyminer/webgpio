@@ -50,6 +50,18 @@ containers:
         owner-gid: 200
         init-command: _init-pg
 
+  test:
+    setup:
+      - !Container webgpio
+      - !Depends .pre-commit-config.yaml
+      - !PipConfig
+        install-python: false
+        dependencies: true
+        python-exe: python3.6
+      - !Py3Requirements requirements/test.txt
+      - !Install [git]
+      - !Sh HOME=/root pre-commit install-hooks
+
 commands:
   _init-pg: !Command
     description: Initialize postgresql database
@@ -109,3 +121,8 @@ commands:
       _app: *run-app-cmd
       _postgres: *run-db-cmd
       _redis: *run-redis-cmd
+
+  lint: !Command
+    description: Run pre-commit linters
+    container: test
+    run: pre-commit run --all-files
